@@ -19,6 +19,9 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglify');
 
+var changed = require('gulp-changed');
+var imagemin = require('gulp-imagemin');
+
 // Initialize Browsersync proxy
 gulp.task('browsersync', function() {
     browserSync.init({
@@ -89,6 +92,16 @@ gulp.task('js-watch', ['js'], function(done) {
 	done();
 });
 
+// Process images
+gulp.task('images', function() {
+    return gulp.src('assets/images/source/*.{svg,png,gif,jpg,jpeg}')
+        .pipe(changed('assets/images/'))
+        .pipe(imagemin({
+			optimizationLevel: 7
+		}))
+        .pipe(gulp.dest('assets/images/'));
+});
+
 // Browsersync reloads
 gulp.task('reload-watch', function(done) {
 	browserSync.reload();
@@ -100,6 +113,7 @@ gulp.task('default', ['browsersync'], function() {
 	gulp.watch('assets/sass/**/*.scss', ['sass']);
 	gulp.watch('assets/scripts/source/*.js', ['js-watch']);
 	gulp.watch('./*.html', ['reload-watch']);
+	gulp.watch('assets/images/source/*.{svg,png,gif,jpg,jpeg}', ['images', 'reload-watch']);
 });
 
 // Sets production environment
