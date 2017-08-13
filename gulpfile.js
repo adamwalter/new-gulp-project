@@ -26,7 +26,8 @@ var imagemin = require('gulp-imagemin');
 gulp.task('browsersync', function() {
     browserSync.init({
         proxy: 'example.dev',
-		port: 1337
+		port: 1337,
+		notify: false
     });
 });
 
