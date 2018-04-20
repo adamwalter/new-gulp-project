@@ -19,6 +19,8 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglify');
 
+var sourcemaps = require('gulp-sourcemaps');
+
 var changed = require('gulp-changed');
 var imagemin = require('gulp-imagemin');
 
@@ -36,6 +38,7 @@ gulp.task('sass', function() {
 	var sassOutputStyle = production() ? 'compressed' : 'expanded';
 
 	return gulp.src('assets/sass/**/*.scss')
+		.pipe(sourcemaps.init())
 		.pipe(sass({
 				outputStyle: sassOutputStyle
 			}).on('error', sass.logError))
@@ -68,6 +71,7 @@ gulp.task('sass', function() {
 			}),
 	        uniqueSelectors()
 	    ]))
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('assets/css'))
 		.pipe(browserSync.stream());
 });
