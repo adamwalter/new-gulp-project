@@ -46,7 +46,7 @@ gulp.task('sass', function() {
 	        autoprefixer({
 			    expand: true,
 			    flatten: true,
-			    browsers: ['last 2 versions']
+			    browsers: ['last 2 versions', '> 1%']
 			}),
 	        pxtorem({
 			    propWhiteList: [
@@ -85,17 +85,17 @@ gulp.task('jshint', function() {
 });
 
 // Process JavaScript
-gulp.task('js', ['jshint'], function () {
+gulp.task('js', gulp.series('jshint', function() {
 	return gulp.src('assets/scripts/source/*.js')
 		.pipe(production(uglify()))
         .pipe(gulp.dest('assets/scripts/site'));
-});
+}));
 
 // Browsersync reloads for JS
-gulp.task('js-watch', ['js'], function(done) {
+gulp.task('js-watch', gulp.series('js', function(done) {
 	browserSync.reload();
 	done();
-});
+}));
 
 // Process images
 gulp.task('images', function() {
@@ -114,12 +114,12 @@ gulp.task('reload-watch', function(done) {
 });
 
 // Default task
-gulp.task('default', ['browsersync'], function() {
+gulp.task('default', gulp.series('browsersync', function() {
 	gulp.watch('assets/sass/**/*.scss', ['sass']);
 	gulp.watch('assets/scripts/source/*.js', ['js-watch']);
 	gulp.watch('./*.html', ['reload-watch']);
 	gulp.watch('assets/images/source/*.{svg,png,gif,jpg,jpeg}', ['images', 'reload-watch']);
-});
+}));
 
 // Sets production environment
 gulp.task('set-prod', production.task);
