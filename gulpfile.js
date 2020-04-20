@@ -2,10 +2,6 @@
 
 var gulp = require('gulp');
 
-var environments = require('gulp-environments');
-var development = environments.development;
-var production = environments.production;
-
 var browserSync = require('browser-sync').create();
 
 var sass = require('gulp-sass');
@@ -17,7 +13,6 @@ var uniqueSelectors = require('postcss-unique-selectors');
 
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
-var uglify = require('gulp-uglify');
 
 var sourcemaps = require('gulp-sourcemaps');
 
@@ -35,12 +30,11 @@ gulp.task('browsersync', function() {
 
 // Process Sass
 gulp.task('sass', function() {
-	var sassOutputStyle = production() ? 'compressed' : 'expanded';
 
 	return gulp.src('assets/sass/**/*.scss')
 		.pipe(sourcemaps.init())
 		.pipe(sass({
-				outputStyle: sassOutputStyle
+				outputStyle: 'compressed'
 			}).on('error', sass.logError))
 		.pipe(postcss([
 	        autoprefixer({
@@ -87,7 +81,6 @@ gulp.task('jshint', function() {
 // Process JavaScript
 gulp.task('js', gulp.series('jshint', function() {
 	return gulp.src('assets/scripts/source/*.js')
-		.pipe(production(uglify()))
         .pipe(gulp.dest('assets/scripts/site'));
 }));
 
@@ -117,12 +110,6 @@ gulp.task('reload-watch', function(done) {
 gulp.task('default', gulp.series('browsersync', function() {
 	gulp.watch('assets/sass/**/*.scss', ['sass']);
 	gulp.watch('assets/scripts/source/*.js', ['js-watch']);
-	gulp.watch('./*.html', ['reload-watch']);
+	gulp.watch('./*.php', ['reload-watch']);
 	gulp.watch('assets/images/source/*.{svg,png,gif,jpg,jpeg}', ['images', 'reload-watch']);
 }));
-
-// Sets production environment
-gulp.task('set-prod', production.task);
-
-// Minifies CSS and JS for production
-gulp.task('deploy', ['set-prod', 'sass', 'js']);
